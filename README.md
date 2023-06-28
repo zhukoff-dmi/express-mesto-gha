@@ -17,4 +17,4 @@
 
 ## Ссылка на репозиторий GitHub
 
-[Репозиторий ->] (https://github.com/zhukoff-dmi/express-mesto-gha)
+[Репозиторий ->](https://github.com/zhukoff-dmi/express-mesto-gha)
