@@ -71,7 +71,7 @@ module.exports.dislikeCard = (req, res, next) => {
         res.status(404).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.stus(200).send({ message: 'Карточка не понравилась' });
+      res.status(200).send({ message: 'Карточка не понравилась' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
