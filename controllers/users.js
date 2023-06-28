@@ -3,12 +3,12 @@ const User = require('../models/user');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((user) => res.send(user))
     .catch((err) => next(err));
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.getUserById)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь не найден' });
