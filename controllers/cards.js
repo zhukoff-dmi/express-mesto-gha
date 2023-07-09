@@ -3,32 +3,28 @@ const Card = require('../models/card');
 
 const ERROR_BAD_REQUEST = 400;
 const ERROR_NOT_FOUND = 404;
-const ERROR_DEFAULT = 500;
+const CREATED = 201;
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res
-      .status(ERROR_DEFAULT)
-      .send({ message: 'На сервере произошла ошибка' }));
+    .catch((err) => next(err));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданны некоректные данные', stack: err.stack });
       } else {
-        res
-          .status(ERROR_DEFAULT)
-          .send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .orFail()
@@ -39,12 +35,12 @@ module.exports.deleteCard = (req, res) => {
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -62,12 +58,12 @@ module.exports.likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(
     cardId,
@@ -85,7 +81,7 @@ module.exports.dislikeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' });
       } else {
-        res.status(ERROR_DEFAULT).send({ message: 'На сервере произошла ошибка' });
+        next(err);
       }
     });
 };
