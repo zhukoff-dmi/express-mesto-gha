@@ -4,6 +4,8 @@ const Card = require('../models/card');
 const ERROR_BAD_REQUEST = 400;
 const ERROR_NOT_FOUND = 404;
 const CREATED = 201;
+const OK = 200;
+const ERROR_FORBIDDEN = 403;
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -26,9 +28,19 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .orFail()
-    .then(() => res.status(200).send({ message: 'Карточка удалена' }))
+    .then((card) => {
+      const owner = card.owner.toString();
+      const user = req.user._id.toString();
+      if (owner === user) {
+        return Card.deleteOne(card)
+          .then(() => {
+            res.status(OK).send({ message: 'Карточка удалена' });
+          });
+      }
+      return next(res.status(ERROR_FORBIDDEN).send({ message: 'У вас недостаточно прав' }));
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' });
@@ -52,7 +64,7 @@ module.exports.likeCard = (req, res, next) => {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send({ message: 'Карточка понравилась' });
+      res.status(OK).send({ message: 'Карточка понравилась' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -75,7 +87,7 @@ module.exports.dislikeCard = (req, res, next) => {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка не найдена' });
         return;
       }
-      res.status(200).send({ message: 'Карточка не понравилась' });
+      res.status(OK).send({ message: 'Карточка не понравилась' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
