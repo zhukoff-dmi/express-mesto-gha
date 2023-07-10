@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-
-const createToken = require('../middlewares/auth');
 
 const OK = 200;
 const ERROR_BAD_REQUEST = 400;
@@ -98,7 +97,7 @@ module.exports.login = (req, res, next) => {
           if (!isEqual) {
             next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
           }
-          const token = createToken({ _id: user._id });
+          const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7d' });
           return res.status(OK).send(token);
         });
     })

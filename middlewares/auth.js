@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-module.exports.createToken = (payload) => jwt.sign(payload, 'super-secret-key', { expiresIn: '7d' });
-
 module.exports.auth = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -21,6 +19,5 @@ module.exports.auth = (req, res, next) => {
       .send({ message: 'Необходима авторизация ' });
   }
   req.user = payload;
-  next();
-  return false;
+  return next();
 };
