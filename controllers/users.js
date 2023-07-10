@@ -90,15 +90,15 @@ module.exports.login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
+        next(res.status(ANAUTHORUZED_ERROR).send({ message: 'Неправильные почта или пароль' }));
       }
       return bcrypt.compare(password, user.password)
         .then((isEqual) => {
           if (!isEqual) {
-            next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
+            next(res.status(ANAUTHORUZED_ERROR).send({ message: 'Неправильные почта или пароль' }));
           }
           const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7d' });
-          return res.status(OK).send(token);
+          return res.status(OK).send({ token });
         });
     })
     .catch(next);

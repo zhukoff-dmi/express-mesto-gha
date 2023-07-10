@@ -10,9 +10,7 @@ const validation = require('../middlewares/validation');
 router.post('/signin', validation.login, login);
 router.post('/signup', validation.createUser, createUser);
 
-router.use(auth);
-
-router.use('/cards', cardsRouter);
-router.use('/users', userRouter);
+router.use('/cards', auth, cardsRouter);
+router.use('/users', auth, userRouter);
 
 module.exports = router;
