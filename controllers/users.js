@@ -105,27 +105,11 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        next(res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь не найден' }));
-      } else {
-        res.send({
-          _id: user._id,
-          name: user.name,
-          about: user.about,
-          email: user.email,
-          avatar: user.avatar,
-        });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' }));
-      } else {
-        next(err);
-      }
-    });
+  const userId = req.user._id;
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.status(OK).send(user))
+    .catch(next);
 };
 
 module.exports.updateAvatar = (req, res, next) => {
