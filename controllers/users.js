@@ -83,11 +83,11 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль');
+        next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
       }
       bcrypt.compare(password, user.password, (err, passwordMatch) => {
         if (!passwordMatch) {
-          return next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
+          next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
         }
         const token = createToken(user._id);
         return res.status(OK).send(token);
