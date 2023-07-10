@@ -83,7 +83,7 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
+        res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль');
       }
       bcrypt.compare(password, user.password, (err, passwordMatch) => {
         if (!passwordMatch) {
