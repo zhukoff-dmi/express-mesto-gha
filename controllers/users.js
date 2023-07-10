@@ -17,17 +17,17 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь не найден' });
-        return;
+        next(res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь не найден' }));
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' });
+        next(res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некоректные данные' }));
       } else {
         next(err);
       }
