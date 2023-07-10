@@ -9,6 +9,7 @@ const ERROR_BAD_REQUEST = 400;
 const ERROR_NOT_FOUND = 404;
 const CREATED = 201;
 const CONFLICT_ERROR = 409;
+const ANAUTHORUZED_ERROR = 401;
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
@@ -79,14 +80,14 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findOne({ email }).selected('+password')
+  return User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(res.status(401).send('Неправильные почта или пароль'));
+        next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
       }
       bcrypt.compare(password, user.password, (err, passwordMatch) => {
         if (!passwordMatch) {
-          next(res.status(401).send('Неправильные почта или пароль'));
+          return next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
         }
         const token = createToken(user._id);
         return res.status(OK).send(token);
