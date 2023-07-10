@@ -65,7 +65,13 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(CREATED).send(user))
+    .then((user) => res.status(CREATED).send({
+      _id: user._id,
+      name: user.name,
+      about: user.about,
+      email: user.email,
+      avatar: user.avatar,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         res.status(CONFLICT_ERROR).send({ message: 'Такой Email уже используется' });
@@ -80,7 +86,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findOne({ email }).select('+password')
+  return User.findOne({ email }).selected('+password')
     .then((user) => {
       if (!user) {
         next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
