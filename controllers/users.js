@@ -86,19 +86,21 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findOne({ email }).selected('+password')
+  User
+    .findOne({ email })
+    .select('+password')
     .then((user) => {
       if (!user) {
         next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
       }
-      bcrypt.compare(password, user.password, (err, passwordMatch) => {
-        if (!passwordMatch) {
-          next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
-        }
-        const token = createToken(user._id);
-        return res.status(OK).send(token);
-      });
-      return false;
+      return bcrypt.compare(password, user.password)
+        .then((isEqual) => {
+          if (!isEqual) {
+            next(res.status(ANAUTHORUZED_ERROR).send('Неправильные почта или пароль'));
+          }
+          const token = createToken({ _id: user._id });
+          return res.status(OK).send(token);
+        });
     })
     .catch(next);
 };

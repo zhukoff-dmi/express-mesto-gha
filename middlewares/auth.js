@@ -14,7 +14,7 @@ module.exports.auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'super-swcret-key');
+    payload = jwt.verify(token, 'super-secret-key');
   } catch (err) {
     return res
       .status(401)
